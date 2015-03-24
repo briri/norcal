@@ -5,11 +5,31 @@
 
 	<script src="http://d3js.org/d3.v3.min.js"></script>
 	<script src="http://d3js.org/topojson.v1.min.js"></script>
+	
+	<style>
+		.marine_polys{
+			fill: #99CCFF;
+		}
+		.region_polys{
+			fill: #CCB299;
+		}
+		.line{
+			fill: none;
+			stroke: #000;
+			stroke-linejoin: round;
+		}
+		.dashed-line{
+			fill: none;
+			stroke: #000;
+			stroke-dasharray: 2, 2;
+			stroke-linejoin: round;
+		}
+	</style>
 </head>
 <body>
 	
 	<script>
-		var width = 960, 
+		var width = 1240, 
 				height = 1160;
 	
 		var svg = d3.select("body").append("svg").attr("width", width).attr("height", height);
@@ -17,12 +37,22 @@
 		d3.json("../data/norcal-topo.json", function(error, norcal){
 			if(error) return console.error(error);
 
+			console.log("width: " + width + ", height: " + height);
 			console.log(norcal);
 			
-			svg.append("path")
-							.datum(topojson.feature(norcal, norcal.objects.ne_coastline_norcal2))
-							.attr("d", d3.geo.path().projection(d3.geo.mercator()));
-														
+			var marine_polys = topojson.feature(norcal, norcal.objects.ne_geography_marine_polys_norcal2);
+			var region_polys = topojson.feature(norcal, norcal.objects.ne_geography_regions_polys_norcal2);
+			var graticules = topojson.feature(norcal, norcal.objects.ne_graticules_1_norcal2);
+			var coastline = topojson.feature(norcal, norcal.objects.ne_coastline_norcal2);
+
+			var projection = d3.geo.mercator().scale(60000).center([-123, 38]).translate([width / 2, height / 2]);
+			var path = d3.geo.path().projection(projection);
+			
+			svg.append("path").datum(region_polys).attr("d", path).attr("class", "region_polys");
+			svg.append("path").datum(marine_polys).attr("d", path).attr("class", "marine_polys");
+			svg.append("path").datum(coastline).attr("d", path).attr("class", "line");
+			svg.append("path").datum(graticules).attr("d", path).attr("class", "dashed-line");
+			
 		});
 	</script>
 	
