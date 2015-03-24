@@ -7,6 +7,7 @@
 	<script src="http://d3js.org/topojson.v1.min.js"></script>
 	
 	<style>
+		.default{ background-color: #CCB299; }
 		.marine_polys{
 			fill: #99CCFF;
 		}
@@ -18,11 +19,28 @@
 			stroke: #000;
 			stroke-linejoin: round;
 		}
+		.river{
+			fill: none;
+			stroke: #99CCFF;
+			stroke-linejoin: round;
+		}
 		.dashed-line{
 			fill: none;
 			stroke: #000;
 			stroke-dasharray: 2, 2;
 			stroke-linejoin: round;
+		}
+		
+		.bathymetry4000{ fill: #D0E3F5; }
+		.bathymetry3000{ fill: #C4DCF2; }
+		.bathymetry2000{ fill: #B9D4F0; }
+		.bathymetry1000{ fill: #ADCDEE; }
+		.bathymetry200{ fill: #A1C6EB; }
+		.bathymetry0{ fill: #96BFE8; }
+		
+		.island{
+			fill: #CCB299;
+			stroke: #000;
 		}
 	</style>
 </head>
@@ -32,7 +50,7 @@
 		var width = 1240, 
 				height = 1160;
 	
-		var svg = d3.select("body").append("svg").attr("width", width).attr("height", height);
+		var svg = d3.select("body").append("svg").attr("width", width).attr("height", height).attr("class", "default");
 	
 		d3.json("../data/norcal-topo.json", function(error, norcal){
 			if(error) return console.error(error);
@@ -40,19 +58,51 @@
 			console.log("width: " + width + ", height: " + height);
 			console.log(norcal);
 			
-			var marine_polys = topojson.feature(norcal, norcal.objects.ne_geography_marine_polys_norcal2);
-			var region_polys = topojson.feature(norcal, norcal.objects.ne_geography_regions_polys_norcal2);
-			var graticules = topojson.feature(norcal, norcal.objects.ne_graticules_1_norcal2);
-			var coastline = topojson.feature(norcal, norcal.objects.ne_coastline_norcal2);
+			var marine_polys = topojson.feature(norcal, norcal.objects.marine_polys);
+			var region_polys = topojson.feature(norcal, norcal.objects.regions_polys);
+			var islands_polys = topojson.feature(norcal, norcal.objects.minor_islands);
+			var lakes = topojson.feature(norcal, norcal.objects.lakes_north_america);
+			var rivers = topojson.feature(norcal, norcal.objects.rivers_north_america);
+			
+			var coastline = topojson.feature(norcal, norcal.objects.coastline);
+			var islands_coastline = topojson.feature(norcal, norcal.objects.minor_islands_coastline);
 
-			var projection = d3.geo.mercator().scale(60000).center([-123, 38]).translate([width / 2, height / 2]);
+			var graticules = topojson.feature(norcal, norcal.objects.graticules_1);
+			//var islands_labels = topojson.feature(norcal, norcal.objects.minor_islands_label_points);
+			//var elevations = topojson.feature(norcal, norcal.objects.regions_elevation_points);
+			//var ocean_scale = topojson.feature(norcal, norcal.objects.ocean_scale_rank);
+			var bathymetry4000 = topojson.feature(norcal, norcal.objects.bathymetry_G_4000);
+			var bathymetry3000 = topojson.feature(norcal, norcal.objects.bathymetry_H_3000);
+			var bathymetry2000 = topojson.feature(norcal, norcal.objects.bathymetry_I_2000);
+			var bathymetry1000 = topojson.feature(norcal, norcal.objects.bathymetry_J_1000);
+			var bathymetry200 = topojson.feature(norcal, norcal.objects.bathymetry_K_200);
+			var bathymetry0 = topojson.feature(norcal, norcal.objects.bathymetry_L_0);
+
+			var projection = d3.geo.mercator().scale(18000).center([-123, 38]);//.translate([width / 2, height / 2]);
 			var path = d3.geo.path().projection(projection);
 			
-			svg.append("path").datum(region_polys).attr("d", path).attr("class", "region_polys");
-			svg.append("path").datum(marine_polys).attr("d", path).attr("class", "marine_polys");
-			svg.append("path").datum(coastline).attr("d", path).attr("class", "line");
-			svg.append("path").datum(graticules).attr("d", path).attr("class", "dashed-line");
+//			svg.append("path").datum(region_polys).attr("d", path).attr("class", "region_polys");
+//			svg.append("path").datum(marine_polys).attr("d", path).attr("class", "marine_polys");
+			svg.append("path").datum(islands_polys).attr("d", path).attr("class", "region_polys");
+			svg.append("path").datum(lakes).attr("d", path).attr("class", "marine_polys");
+			svg.append("path").datum(rivers).attr("d", path).attr("class", "river");
 			
+			svg.append("path").datum(bathymetry0).attr("d", path).attr("class", "bathymetry0");
+			svg.append("path").datum(bathymetry200).attr("d", path).attr("class", "bathymetry200");
+			svg.append("path").datum(bathymetry1000).attr("d", path).attr("class", "bathymetry1000");
+			svg.append("path").datum(bathymetry2000).attr("d", path).attr("class", "bathymetry2000");
+			svg.append("path").datum(bathymetry3000).attr("d", path).attr("class", "bathymetry3000");
+			svg.append("path").datum(bathymetry4000).attr("d", path).attr("class", "bathymetry4000");
+			
+			svg.append("path").datum(coastline).attr("d", path).attr("class", "line");
+			svg.append("path").datum(islands_coastline).attr("d", path).attr("class", "island");
+
+			//svg.append("path").datum(islands_labels).attr("d", path).attr("class", "island");
+			//svg.append("path").datum(elevations).attr("d", path).attr("class", "island");
+			//svg.append("path").datum(ocean_scale).attr("d", path).attr("class", "dashed-line");
+			
+			
+			svg.append("path").datum(graticules).attr("d", path).attr("class", "dashed-line");
 		});
 	</script>
 	
