@@ -1,7 +1,7 @@
 earth
 =====
 
-MERGE TEST AGAIN 3
+MERGE TEST LOCAL
 
 **NOTE: the location of `dev-server.js` has changed from `{repository}/server/` to `{repository}/`**
 
