@@ -1,7 +1,7 @@
 earth
 =====
 
-MERGE TEST
+MERGE TEST AGAIN
 
 **NOTE: the location of `dev-server.js` has changed from `{repository}/server/` to `{repository}/`**
 
