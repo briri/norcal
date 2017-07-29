@@ -1,8 +1,6 @@
 earth
 =====
 
-MERGE TEST NUMBER 2
-
 **NOTE: the location of `dev-server.js` has changed from `{repository}/server/` to `{repository}/`**
 
 "earth" is a project to visualize global weather conditions.
